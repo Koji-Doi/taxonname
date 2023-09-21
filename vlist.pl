@@ -23,13 +23,19 @@ binmode STDOUT, ':utf8';
 binmode STDERR, ':utf8';
 
 my @d;
+my %f;
 # CSV_VPLANT=wamei_checklist_ver.1.10a.csv
 open(my $fhi, '<:utf8', $ARGV[0]) or die;
 $_=<$fhi>;
 while(<$fhi>){
   s/\s*$//;
   my(undef, undef, $fam, $fam_wa, $wa, undef, undef, undef, undef, undef, $sci) = split(/\t/, $_);
-  print join("\t", $., "fam=$fam $fam_wa", "sci=$sci"),"\n";
+#  print join("\t", $., "fam=$fam $fam_wa", "sci=$sci"),"\n";
+  my $rank = rank($sci);
+  push(@d, {sci=>$sci, wa=>$wa, rank=>$rank, src=>'vlist'});
+  $f{$fam} = $fam_wa;
 }
-
+foreach my $f (sort keys %f){
+  push(@d, {sci=>$f, wa=>$f{$f}, rank=>'family', src=>'vlist'});
+}
 tsv(\@d);

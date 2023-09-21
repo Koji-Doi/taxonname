@@ -22,29 +22,23 @@ CSV_FUNGIOLD=Katumoto-Wamei.csv
 TSV_FUNGIOLD=fungi_old.tsv
 CSV_VPLANT=wamei_checklist_ver.1.10a.csv
 TSV_VPLANT=vplant.tsv
-TXT_PLANT0=20210514YList_download_tab.txt
-TSV_PLANT0=ylist.tsv
+#TXT_PLANT0=20210514YList_download_tab.txt
+#TSV_PLANT0=ylist.tsv
 CSV_MAMMAL0=list_20211223.csv
 TSV_MAMMAL0=mammal.tsv
 
 SRC_ALL=$(TSV_TOGO) $(TSV_ALGAE0) $(TSV_HACHU) $(TSV_FISH) $(TSV_FUNGI) $(TSV_PLANT0) $(TSV_VPLANT) $(TSV_MAMMAL0)
 SRC_PERSONAL=$(TSV_TOGO) $(TSV_ALGAE0) $(TSV_HACHU) $(TSV_FISH) $(TSV_FUNGI) $(TSV_PLANT0) $(TSV_VPLANT) $(TSV_MAMMAL0)
 
-t:
-	@echo $(SRC_ALL)
-
 all: $(TSV_FINAL_PERSONAL)
 
-chk_src: $(SRC_ALL)
-	chkfilesize $(SRC_ALL)
-
 $(TSV_FINAL_PERSONAL): $(TSV_TOGO) $(TSV_ALGAE0) $(TSV_HACHU) $(TSV_FISH) $(TSV_FUNGI) $(TSV_PLANT0) $(TSV_VPLANT) $(TSV_MAMMAL0) merge.pl Taxon.pm
-	perl merge.pl $^ > $@
+	perl merge.pl $(filter %.tsv,$^) > $@
 
 public: $(TSV_FINAL)
 
 $(TSV_FINAL): $(TSV_TOGO) $(TSV_HACHU) $(TSV_FISH) $(TSV_FUNGI) $(TSV_VPLANT) merge.pl Taxon.pm
-	perl merge.pl $^ > $@
+	perl merge.pl $(filter %.tsv,$^) > $@
 
 test: $(TSV_ALGAE0) $(TSV_FISH) $(TSV_FUNGI)
 
@@ -55,10 +49,10 @@ testdb:
 hachuu-ryousei: $(TSV_HACHU)
 
 $(TSV_HACHU): $(HTML_HACHU) hachuu-ryousei.pl Taxon.pm
-	perl hachuu-ryousei.pl $^ > $@
+	perl hachuu-ryousei.pl $< > $@
 
 # The published tsv file is useless, so remake it from json file
-$(TSV_TOGO): $(JSON_TOGO) togodb.pl Taxon.pm
+$(TSV_TOGO): $(JSON_TOGO) togodb.pl
 	perl togodb.pl
 
 $(TSV_ALGAE0): $(HTML_ALGAE) algae.pl Taxon.pm
@@ -68,10 +62,10 @@ $(TSV_FISH): $(CSV_FISH) fish.pl Taxon.pm
 	perl fish.pl $< > $@
 
 $(TSV_FUNGI): $(CSV_FUNGIOLD) $(CSV_FUNGI) fungi.pl Taxon.pm
-	perl fungi.pl $< > $@
+	perl fungi.pl $(filter %.csv,$^) > $@
 
-$(TSV_PLANT0): $(TXT_PLANT0) vlist.pl Taxon.pm
-	perl vlist.pl $< > $@
+#$(TSV_PLANT0): $(TXT_PLANT0) vlist.pl Taxon.pm
+#	perl vlist.pl $< > $@
 
 $(TSV_VPLANT): $(CSV_VPLANT) vlist.pl Taxon.pm 
 	perl vlist.pl $< > $@

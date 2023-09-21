@@ -29,16 +29,22 @@ my %data;
 open(my $fhi, '<utf8:', $ARGV[0]) or die;
 $_=<$fhi>;
 while(<$fhi>){
-  my @f = split(/\t/, $_);
-  my $sci = join(" ", @f[3,4,5,6]);
+  my @f = split(/ *\t */, $_);
+  #my $sci = join(" ", map {$_||''} @f[3,4,5,6]);
   #my $rank = ($f[5] eq 'var.')   ? 'variety'
   #          : ($f[5] eq 'subsp.') ? 'subspecies'
   #          : ($f[5] eq 'forma')  ? 'form'
   #          : 'species';
+  my $sci = $f[2];
   my $rank = rank($sci);
+  unless($f[0]){
+    print "$.: ?????\n";
+    $DB::single=$DB::single=1;
+  }
   $f[1] or next; # no wamei defined
-  $data{$sci} = {wa=>$f[1], rank=>$rank, src=>'fungiold'};
+  $data{$sci} = {wa=>$f[1], rank=>$rank, src=>'fungi1'};
 }
+    $DB::single=$DB::single=1;
 close $fhi;
 
 # new data file
@@ -56,15 +62,15 @@ $data=~s{"([\s\S]*?)"}{
 #print $data;
 
 foreach my $l (split(/\n/, $data)){
-  my @f = split(/\t/, $l);
+  my @f = split(/\s*\t\s*/, $l);
   my($genus, $sp, $wa) = @f[2,3,16];
   $wa or next;
   $wa=~/[\p{Han}\p{Hiragana}]/ and next;
-  $wa and $data{"$genus $sp"} = {wa=>$wa, rank=>"species", src=>'fungi'};
+  $wa and $data{"$genus $sp"} = {wa=>$wa, rank=>"species", src=>'fungi2'};
 }
 
 my @d;
 foreach my $s (keys %data){
-  push(@d, {sci=>$s, wa=>$data{$s}{wa}, rank=>$data{$s}{class}, src=>$data{$s}{src}});
+  push(@d, {sci=>$s, wa=>$data{$s}{wa}, rank=>$data{$s}{rank}, src=>$data{$s}{src}});
 }
 tsv(\@d);

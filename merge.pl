@@ -22,10 +22,12 @@ binmode STDIN,  ':utf8';
 binmode STDOUT, ':utf8';
 binmode STDERR, ':utf8';
 
-{
-my @d;
+my @infiles = @ARGV;
+my %d;
+
 # $(CSV_TOGO)
-open(my $fhi, '<:utf8', 'species_names_latin_vs_japanese.tsv') or die;
+#open(my $fhi, '<:utf8', 'species_names_latin_vs_japanese.tsv') or die;
+open(my $fhi, '<:utf8', $infiles[0]) or die "$infiles[0] not accessible";
 while(<$fhi>){
   (/virus$/ or /virus\s/) and next;
   s/[\n\r]*$//;
@@ -35,8 +37,26 @@ while(<$fhi>){
   $sci=~/subsp\./      and $rank='subspecies';
   $sci=~/var\./        and $rank='variety';
   $sci=~/f\./          and $rank='form';
+  my $src = join(", ", $ref1, $ref2, $date);
+  $d{$sci}{$wa} = {rank=>$rank, src=>$src};
+}
 
-  push(@d, {sci=>$sci, wa=>$wa, rank=>$rank, src=>"$ref1 $ref2"});
+foreach my $infile (@infiles[1..$#infiles]){
+  open(my $fhi, '<:utf8', $infile) or die "$infile not accessible";
+  while(<$fhi>){
+    chomp;
+    my($sci, $wa, $rank, $src) = split(/\t/, $_);
+    $d{$sci}{$wa} = {rank=>$rank, src=>$src};
+  }
 }
+$DB::single=$DB::single=1;
+my @d;
+foreach my $sci (keys %d){
+  foreach my $wa (keys %{$d{$sci}}){
+  #print join("\t", $sci, $wa, $rank, $src), "\n";
+    push(@d, {wa=>$wa, sci=>$sci, rank=>$d{$sci}{$wa}{rank}, src=>$d{$sci}{$wa}{src}});
+  }
+}
+
 tsv(\@d);
-}
+

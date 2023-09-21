@@ -43,7 +43,7 @@ sub init{
    節 section
    亜節 subsection
    種 species
-   亜種 subspicies
+   亜種 subspecies
    変種 variety
    品種 form
   };
@@ -63,8 +63,16 @@ sub tsv{
     $xx->[0] = $x;
   }
   foreach my $i (@$xx){
-    $DB::single=1;
-    exists($rank_lj{$i->{rank}}) or warn("Illegal rank name: ".$i->{rank});
+    unless($i->{rank}){
+      my($p, $f, $l) = caller();
+      warn("[$p, $f, $l] Rank name not defined ");
+      next;
+    }
+    unless(exists($rank_lj{$i->{rank}})){
+      my($p, $f, $l) = caller();
+      warn("[$p, $f, $l] Illegal rank name: ".$i->{rank});
+      $i->{rank} .= '?';
+    }
     print join(
       "\t", map {
         my $x = $i->{$_}; $x=~s/^\s*//; $x=~s/\s*$//; $x;
@@ -76,14 +84,13 @@ sub tsv{
 sub rank{
   my($x0) = @_;
   (defined $rank{'種'}) or init();
-  $DB::single=$DB::single=1;
   my(@w) =  split(/\s+/, $x0);
   $w[2] ||= '';
   my $rank = ($x0=~/^\[-a-zA-Z]+ [-a-zA-Z]+ [-a-zA-Z]+/) ? 'subspecies' : 'species';
-     $rank = ($x0=~/var\./)   ? 'variety'
-           : ($x0=~/subsp\./) ? 'subspecies'
+     $rank = ($x0=~/f\./)     ? 'form'
            : ($x0=~/forma/)   ? 'form'
-           : ($x0=~/f\./)     ? 'form'
+           : ($x0=~/var\./)   ? 'variety'
+           : ($x0=~/subsp\./) ? 'subspecies'
            : $rank;
   return($rank);
 }
