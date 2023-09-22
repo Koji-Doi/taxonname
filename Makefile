@@ -6,12 +6,14 @@
 
 SRCDIR=/home/kdoi2/raid/proj230314newtaxonomy/taxdump_230314_1720
 WDIR=/home/kdoi2/raid/proj230314newtaxonomy
+DB_LJ=taxon_lj.cdb
+DB_JL=taxon_jl.cdb
+TSV_FINAL=final.tsv
+TSV_FINAL_PERSONAL=final_personal.tsv
 HTML_HACHU=hachuu-ryousei.html
 TSV_HACHU=hachuu-ryousei.tsv
 JSON_TOGO=species_names_latin_vs_japanese.json
 TSV_TOGO=species_names_latin_vs_japanese.tsv
-TSV_FINAL=final.tsv
-TSV_FINAL_PERSONAL=final_personal.tsv
 HTML_ALGAE=Brown_A_all.html   Brown_Ma_all.html  Brown_Sa_all.html   Green_A_all.html   Green_Ma_all.html	Green_Sa_all.html  Red_A_all.html   Red_Ma_all.html  Red_Sa_all.html Brown_Ha_all.html  Brown_Na_all.html  Brown_Ta_all.html   Green_Ha_all.html  Green_Na_all.html Green_Ta_all.html  Red_Ha_all.html  Red_Na_all.html  Red_Ta_all.html Brown_Ka_all.html  Brown_Ra_all.html  Brown_Ya_all.html  Green_Ka_all.html  Green_Ra_all.html Green_Ya_all.html  Red_Ka_all.html  Red_Ra_all.html  Red_Ya_all.html
 TSV_ALGAE0=algae.tsv
 CSV_FISH=20230801_JAFList.csv
@@ -30,7 +32,12 @@ TSV_MAMMAL0=mammal.tsv
 SRC_ALL=$(TSV_TOGO) $(TSV_ALGAE0) $(TSV_HACHU) $(TSV_FISH) $(TSV_FUNGI) $(TSV_PLANT0) $(TSV_VPLANT) $(TSV_MAMMAL0)
 SRC_PERSONAL=$(TSV_TOGO) $(TSV_ALGAE0) $(TSV_HACHU) $(TSV_FISH) $(TSV_FUNGI) $(TSV_PLANT0) $(TSV_VPLANT) $(TSV_MAMMAL0)
 
-all: $(TSV_FINAL_PERSONAL)
+all: $(TSV_FINAL_PERSONAL)  $(DB_LJ) $(DB_JL)
+
+makedb: $(DB_LJ) $(DB_JL)
+
+$(DB_LJ) $(DB_JL): $(TSV_FINAL_PERSONAL) makedb.pl
+	perl makedb.pl $<
 
 $(TSV_FINAL_PERSONAL): $(TSV_TOGO) $(TSV_ALGAE0) $(TSV_HACHU) $(TSV_FISH) $(TSV_FUNGI) $(TSV_PLANT0) $(TSV_VPLANT) $(TSV_MAMMAL0) merge.pl Taxon.pm
 	perl merge.pl $(filter %.tsv,$^) > $@
