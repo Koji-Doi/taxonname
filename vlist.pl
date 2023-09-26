@@ -31,6 +31,7 @@ while(<$fhi>){
   s/\s*$//;
   my(undef, undef, $fam, $fam_wa, $wa, undef, undef, undef, undef, undef, $sci) = split(/\t/, $_);
 #  print join("\t", $., "fam=$fam $fam_wa", "sci=$sci"),"\n";
+  $wa=~/[a-zA-Z0-9]/ and next; # Not wamei
   my $rank = rank($sci);
   push(@d, {sci=>$sci, wa=>$wa, rank=>$rank, src=>'vlist'});
   $f{$fam} = $fam_wa;

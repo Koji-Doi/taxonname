@@ -1,14 +1,14 @@
 #!/usr/bin/perl
 
-# read nodes.dmp and names.dma, and construct inner-db based on CDB
+# read nodes.dmp and names.dmp, and construct inner-db based on CDB
 
 use strict;
 use CDB_File;
 use lib '.';
-my $srcdir="/home/kdoi/download/taxonomy";
-use Arg;
-arg(
-  "s|sdir=s Directory where target *.dmp files exist" => \$srcdir
+my $srcdir;
+use Getopt::Long;
+GetOptions(
+  "s|sdir=s" => \$srcdir
 );
 my %dbfile;
 my %cdb;
@@ -56,7 +56,7 @@ while(<$fhi>){
 }
 close $fhi;
 
-open(my $fhi, "<", "$srcdir/nodes.dmp") or die;
+open($fhi, "<", "$srcdir/nodes.dmp") or die;
 while(<$fhi>){
   my($tid,$ptid,$rank)=/(\d+)\s*\|\s*(\d+)\s*\|\s*([^|]+)/;
 #  print "tid=$tid ptid=$ptid rand=$rank\n";

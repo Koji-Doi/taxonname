@@ -6,6 +6,9 @@
 
 SRCDIR=/home/kdoi2/raid/proj230314newtaxonomy/taxdump_230314_1720
 WDIR=/home/kdoi2/raid/proj230314newtaxonomy
+CDBS=taxonchildren.cdb taxonid2.cdb taxonid.cdb taxonname2.cdb taxonname.cdb taxonparent.cdb taxonrank.cdb
+DMPS=$(SRCDIR)/names.dmp $(SRCDIR)/nodes.dmp
+
 DB_LJ=taxon_lj.cdb
 DB_JL=taxon_jl.cdb
 TSV_FINAL=final.tsv
@@ -18,7 +21,8 @@ HTML_ALGAE=Brown_A_all.html   Brown_Ma_all.html  Brown_Sa_all.html   Green_A_all
 TSV_ALGAE0=algae.tsv
 CSV_FISH=20230801_JAFList.csv
 TSV_FISH=jaflist.tsv
-CSV_FUNGI=DB20200311.csv
+# CSV_FUNGI=DB20200311.csv
+CSV_FUNGI=DB20200311_redownloaded.csv
 TSV_FUNGI=fungi.tsv
 CSV_FUNGIOLD=Katumoto-Wamei.csv
 TSV_FUNGIOLD=fungi_old.tsv
@@ -32,9 +36,14 @@ TSV_MAMMAL0=mammal.tsv
 SRC_ALL=$(TSV_TOGO) $(TSV_ALGAE0) $(TSV_HACHU) $(TSV_FISH) $(TSV_FUNGI) $(TSV_PLANT0) $(TSV_VPLANT) $(TSV_MAMMAL0)
 SRC_PERSONAL=$(TSV_TOGO) $(TSV_ALGAE0) $(TSV_HACHU) $(TSV_FISH) $(TSV_FUNGI) $(TSV_PLANT0) $(TSV_VPLANT) $(TSV_MAMMAL0)
 
-all: $(TSV_FINAL_PERSONAL)  $(DB_LJ) $(DB_JL)
+all: $(TSV_FINAL_PERSONAL)  $(DB_LJ) $(DB_JL) $(CDBS)
 
-makedb: $(DB_LJ) $(DB_JL)
+make_ncbi_db: $(CDBS)
+
+$(CDBS): $(DMPS) ncbi.pl
+	perl ncbi.pl -s $(SRCDIR)
+
+make_lj_db: $(DB_LJ) $(DB_JL)
 
 $(DB_LJ) $(DB_JL): $(TSV_FINAL_PERSONAL) makedb.pl
 	perl makedb.pl $<

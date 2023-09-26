@@ -53,6 +53,7 @@ sub init{
   }
 }
 
+# データベース(KVstore)の素材とするタブ区切りエキストを出力
 sub tsv{
   my($x) = @_;
   my $xx;
@@ -63,6 +64,7 @@ sub tsv{
     $xx->[0] = $x;
   }
   foreach my $i (@$xx){
+    $i->{wa}=/^[- a-zA-Z0-9.]+$/ and next; # 少なくとも和名とは考えられないのでスキップ
     unless($i->{rank}){
       my($p, $f, $l) = caller();
       warn("[$p, $f, $l] Rank name not defined ");
@@ -70,17 +72,24 @@ sub tsv{
     }
     unless(exists($rank_lj{$i->{rank}})){
       my($p, $f, $l) = caller();
+      # よくわからない分類階級。一応残すが警告。
       warn("[$p, $f, $l] Illegal rank name: ".$i->{rank});
       $i->{rank} .= '?';
     }
     print join(
       "\t", map {
-        my $x = $i->{$_}; $x=~s/^\s*//; $x=~s/\s*$//; $x;
+        my $x = $i->{$_};
+        # 日本語文字列の「正規化」
+        $x=~s/^\s*//; $x=~s/\s*$//; 
+        $x=~s/^"(.*)"$/$1/;
+        $x=~s/^”(.*)”$/$1/; 
+        $x;
       } qw/sci wa rank src/
     ), "\n";
   }
 }
 
+# 学名表記から「種」以下の分類階級を検出
 sub rank{
   my($x0) = @_;
   (defined $rank{'種'}) or init();

@@ -29,23 +29,23 @@ while(<$fhi>){
   s/\s*$//;
   my @f = split(/\t/, $_);
   ($f[1] eq '－') and next;
-  print STDERR "latin=$f[0], wamei=$f[1]\n";
+  #print STDERR "latin=$f[0], wamei=$f[1]\n";
   $lj{$f[0]}{$f[1]}++;
   $jl{$f[1]}{$f[0]}++;
 }
 
 my $dbfile_lj = "taxon_lj.cdb";
 my $dbfile_jl = "taxon_jl.cdb";
-my $taxondb_lj = new CDB_File($dbfile_lj, $dbfile_lj.".$$") or die;
-my $taxondb_jl = new CDB_File($dbfile_jl, $dbfile_jl.".$$") or die;
+my $taxondb_lj = new CDB_File($dbfile_lj, $dbfile_lj) or die;
+my $taxondb_jl = new CDB_File($dbfile_jl, $dbfile_jl) or die;
 foreach my $k (sort keys %lj){
   my $jap = join('/', keys %{$lj{$k}});
-  print STDERR "$jap\n";
+  #print STDERR "$jap\n";
   $taxondb_lj->insert($k, $jap);
 }
 foreach my $k (sort keys %jl){
   my $latin = join('/', keys %{$jl{$k}});
-  print STDERR "$latin\n";
+  #print STDERR "$k -> $latin\n";
   $taxondb_jl->insert($k, $latin);
 }
 $taxondb_lj->finish;
