@@ -64,7 +64,7 @@ sub tsv{
     $xx->[0] = $x;
   }
   foreach my $i (@$xx){
-    $i->{wa}=/^[- a-zA-Z0-9.]+$/ and next; # 少なくとも和名とは考えられないのでスキップ
+    $i->{wa}=~/^[- a-zA-Z0-9.]+$/ and next; # 少なくとも和名とは考えられないのでスキップ
     unless($i->{rank}){
       my($p, $f, $l) = caller();
       warn("[$p, $f, $l] Rank name not defined ");
